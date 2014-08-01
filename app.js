@@ -19,6 +19,16 @@ app.use(bodyParser.urlencoded());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// add cPath and cRender
+app.use(function (req, res, next) {
+    var path = req.url.substr(1);
+    res.cPath = path;
+    res.cRender = function (params) {
+        res.render(res.cPath, params);
+    }
+    next();
+});
+
 ////TODO
 dirWalker.walk(__dirname + "/routes", 0, function(path, floor) {
   if (floor === 0) {
