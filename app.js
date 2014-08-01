@@ -4,10 +4,7 @@ var favicon = require('static-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
-var routes = require('./routes/index');
-var users = require('./routes/users');
-var tests = require('./routes/tests');
+var dirWalker = require('./lib/walk.js');
 
 var app = express();
 
@@ -22,9 +19,14 @@ app.use(bodyParser.urlencoded());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', routes);
-app.use('/users', users);
-app.use('/test', tests);
+////TODO
+dirWalker.walk(__dirname + "/routes", 0, function(path, floor) {
+  if (floor === 0) {
+    return;
+  }
+  var p = path.substr((__dirname + "/routes").length);
+  app.use(p.substr(0,p.length-3), require("./routes" + p));
+});
 
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {
